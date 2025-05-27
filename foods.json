@@ -1,0 +1,152 @@
+[
+  {
+    "name": "Oatmeal with Berries",
+    "mealType": "breakfast",
+    "calories": 350,
+    "protein": 10,
+    "carbs": 55,
+    "fat": 5,
+    "cost": 2.5,
+    "image": "images/oatmeal_berries.jpg"
+  },
+  {
+    "name": "Grilled Chicken Salad",
+    "mealType": "lunch",
+    "calories": 450,
+    "protein": 40,
+    "carbs": 20,
+    "fat": 15,
+    "cost": 6.0,
+    "image": "images/grilled_chicken_salad.jpg"
+  },
+  {
+    "name": "Quinoa and Veggies",
+    "mealType": "dinner",
+    "calories": 500,
+    "protein": 15,
+    "carbs": 60,
+    "fat": 10,
+    "cost": 5.0,
+    "image": "images/quinoa_veggies.jpg"
+  },
+  {
+    "name": "Greek Yogurt with Honey",
+    "mealType": "snack",
+    "calories": 150,
+    "protein": 12,
+    "carbs": 18,
+    "fat": 0,
+    "cost": 1.5,
+    "image": "images/greek_yogurt_honey.jpg"
+  },
+  {
+    "name": "Almond Butter Toast",
+    "mealType": "breakfast",
+    "calories": 300,
+    "protein": 8,
+    "carbs": 30,
+    "fat": 15,
+    "cost": 2.0,
+    "image": "images/almond_butter_toast.jpg"
+  },
+  {
+    "name": "Turkey Sandwich",
+    "mealType": "lunch",
+    "calories": 400,
+    "protein": 35,
+    "carbs": 35,
+    "fat": 8,
+    "cost": 4.5,
+    "image": "images/turkey_sandwich.jpg"
+  },
+  {
+    "name": "Veggie Stir Fry",
+    "mealType": "dinner",
+    "calories": 450,
+    "protein": 12,
+    "carbs": 55,
+    "fat": 12,
+    "cost": 4.0,
+    "image": "images/veggie_stir_fry.jpg"
+  },
+  {
+    "name": "Protein Shake",
+    "mealType": "snack",
+    "calories": 250,
+    "protein": 30,
+    "carbs": 10,
+    "fat": 5,
+    "cost": 3.0,
+    "image": "images/protein_shake.jpg"
+  },
+  {
+    "name": "Pancakes with Syrup",
+    "mealType": "breakfast",
+    "calories": 550,
+    "protein": 12,
+    "carbs": 80,
+    "fat": 15,
+    "cost": 3.5,
+    "image": "images/pancakes_syrup.jpg"
+  },
+  {
+    "name": "Caesar Salad",
+    "mealType": "lunch",
+    "calories": 350,
+    "protein": 20,
+    "carbs": 15,
+    "fat": 18,
+    "cost": 5.0,
+    "image": "images/caesar_salad.jpg"
+  },
+  {
+    "name": "Spaghetti Bolognese",
+    "mealType": "dinner",
+    "calories": 600,
+    "protein": 35,
+    "carbs": 75,
+    "fat": 20,
+    "cost": 6.5,
+    "image": "images/spaghetti_bolognese.jpg"
+  },
+  {
+    "name": "Fruit Smoothie",
+    "mealType": "snack",
+    "calories": 200,
+    "protein": 5,
+    "carbs": 40,
+    "fat": 2,
+    "cost": 2.5,
+    "image": "images/fruit_smoothie.jpg"
+  },
+  {
+    "name": "Egg and Cheese Sandwich",
+    "mealType": "breakfast",
+    "calories": 400,
+    "protein": 25,
+    "carbs": 30,
+    "fat": 15,
+    "cost": 3.0,
+    "image": "images/egg_cheese_sandwich.jpg"
+  },
+  {
+    "name": "Chicken Wrap",
+    "mealType": "lunch",
+    "calories": 450,
+    "protein": 38,
+    "carbs": 40,
+    "fat": 12,
+    "cost": 5.5,
+    "image": "images/chicken_wrap.jpg"
+  },
+  {
+    "name": "Veggie Omelette",
+    "mealType": "dinner",
+    "calories": 350,
+    "protein": 30,
+    "carbs": 10,
+    "fat": 20,
+    "cost": 4.0,
+    "image": "images/veggie_omelette.jpg"
+  }
+]
