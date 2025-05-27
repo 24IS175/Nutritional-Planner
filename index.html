@@ -1,0 +1,287 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Meal Planner</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #fdf6f0; }
+    h1, h2 { text-align: center; color: #333; }
+    .home-screen, .controls, .meal-grid, .summary, .basket-section, .saved-plans-section {
+      padding: 20px;
+      margin: auto;
+      max-width: 900px;
+    }
+    .home-screen button, .controls button, .controls select, .controls input {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+      background-color: #4caf50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .controls select, .controls input {
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    .meal-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 10px;
+      width: 250px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s;
+    }
+    .meal-card:hover { transform: scale(1.02); }
+    .meal-grid, .basket-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .meal-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 10px;
+      border-radius: 50%;
+      border: 2px solid #ddd;
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 5px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: #4caf50;
+    }
+    .basket-summary, .saved-plans-section {
+      margin-top: 20px;
+      background-color: #fff3e0;
+      padding: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="homePage" class="home-screen">
+    <h1>Smart Meal Planner</h1>
+    <button onclick="startPlanning()">Create New Meal Plan</button>
+    <button onclick="loadSavedPlans()">Load Existing Meal Plan</button>
+    <div id="savedPlansContainer" class="saved-plans-section"></div>
+  </div>  <div id="plannerPage" style="display: none;">
+    <h1>Create Your Meal Plan</h1>
+    <div class="controls">
+      <button onclick="loadMeals()">Load Meals</button>
+      <input type="number" id="budgetInput" placeholder="Max Budget ($)" />
+      <button onclick="filterByBudget()">Filter by Budget</button>
+      <select id="mealTypeFilter" onchange="filterByType()">
+        <option value="all">All Types</option>
+        <option value="breakfast">Breakfast</option>
+        <option value="lunch">Lunch</option>
+        <option value="dinner">Dinner</option>
+        <option value="snack">Snack</option>
+      </select>
+      <select id="sortFilter" onchange="sortMeals()">
+        <option value="none">Sort By</option>
+        <option value="calories">Calories</option>
+        <option value="cost">Cost</option>
+      </select>
+      <button onclick="saveMealPlan()">Save Meal Plan</button>
+      <button onclick="clearBasket()">Clear Basket</button>
+    </div><div class="meal-grid" id="mealsContainer"></div>
+<div class="summary" id="mealSummary"></div>
+
+<h2>Basket</h2>
+<div class="basket-section" id="basketContainer"></div>
+<div class="basket-summary" id="basketProgress"></div>
+
+  </div>  <script>
+    let meals = [];
+    let filteredMeals = [];
+    let basket = [];
+
+    function startPlanning() {
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('plannerPage').style.display = 'block';
+    }
+
+    function loadSavedPlans() {
+      const plans = JSON.parse(localStorage.getItem('mealPlans')) || [];
+      const container = document.getElementById('savedPlansContainer');
+      container.innerHTML = plans.length ? '<h2>Saved Plans:</h2>' : '<p>No saved plans found.</p>';
+      plans.forEach((plan, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = `Plan ${index + 1}`;
+        btn.onclick = () => {
+          basket = plan;
+          startPlanning();
+          updateBasket();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    async function loadMeals() {
+      const response = await fetch('foods.json');
+      meals = await response.json();
+      filteredMeals = [...meals];
+      displayMeals(filteredMeals);
+    }
+
+    function displayMeals(mealList) {
+      const container = document.getElementById('mealsContainer');
+      container.innerHTML = '';
+      mealList.forEach(meal => {
+        const card = document.createElement('div');
+        card.className = 'meal-card';
+
+        const img = document.createElement('img');
+        img.src = meal.image || 'https://via.placeholder.com/80'; // placeholder or your image
+        img.alt = 'Meal Image';
+
+        const title = document.createElement('h3');
+        title.textContent = meal.name;
+
+        const info = `
+          <p>Calories: ${meal.calories}</p>
+          <p>Protein: ${meal.protein}g</p>
+          <p>Carbs: ${meal.carbs}g</p>
+          <p>Fat: ${meal.fat}g</p>
+          <p>Cost: $${meal.cost.toFixed(2)}</p>
+        `;
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add to Basket';
+        addBtn.onclick = () => addToBasket(meal);
+
+        card.append(img, title);
+        card.innerHTML += info;
+        card.appendChild(addBtn);
+
+        container.appendChild(card);
+      });
+      updateSummary(mealList);
+    }
+
+    function updateSummary(list) {
+      const total = list.reduce((acc, m) => {
+        acc.cal += m.calories;
+        acc.pro += m.protein;
+        acc.carb += m.carbs;
+        acc.fat += m.fat;
+        acc.cost += m.cost;
+        return acc;
+      }, { cal: 0, pro: 0, carb: 0, fat: 0, cost: 0 });
+
+      document.getElementById('mealSummary').textContent = `Total - Calories: ${total.cal}, Protein: ${total.pro}g, Carbs: ${total.carb}g, Fat: ${total.fat}g, Cost: $${total.cost.toFixed(2)}`;
+    }
+
+    function filterByBudget() {
+      const budget = parseFloat(document.getElementById('budgetInput').value);
+      if (isNaN(budget)) return;
+      filteredMeals = meals.filter(m => m.cost <= budget);
+      displayMeals(filteredMeals);
+    }
+
+    function filterByType() {
+      const type = document.getElementById('mealTypeFilter').value;
+      filteredMeals = type === 'all' ? [...meals] : meals.filter(m => m.mealType === type);
+      displayMeals(filteredMeals);
+    }
+
+    function sortMeals() {
+      const sortBy = document.getElementById('sortFilter').value;
+      if (sortBy === 'none') return displayMeals(filteredMeals);
+      filteredMeals.sort((a, b) => a[sortBy] - b[sortBy]);
+      displayMeals(filteredMeals);
+    }
+
+    function addToBasket(meal) {
+      basket.push(meal);
+      updateBasket();
+    }
+
+    function removeFromBasket(index) {
+      basket.splice(index, 1);
+      updateBasket();
+    }
+
+    function clearBasket() {
+      basket = [];
+      updateBasket();
+    }
+
+    function updateBasket() {
+      const container = document.getElementById('basketContainer');
+      const progress = document.getElementById('basketProgress');
+      container.innerHTML = '';
+      progress.innerHTML = '';
+
+      if (basket.length === 0) {
+        container.innerHTML = '<p>No meals in the basket yet.</p>';
+        return;
+      }
+
+      let summary = { cal: 0, pro: 0, carb: 0, fat: 0, cost: 0 };
+
+      basket.forEach((meal, index) => {
+        const card = document.createElement('div');
+        card.className = 'meal-card';
+        card.innerHTML = `
+          <h4>${meal.name}</h4>
+          <p>Calories: ${meal.calories}</p>
+          <p>Protein: ${meal.protein}g</p>
+          <p>Carbs: ${meal.carbs}g</p>
+          <p>Fat: ${meal.fat}g</p>
+          <p>Cost: $${meal.cost.toFixed(2)}</p>
+        `;
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = () => removeFromBasket(index);
+        card.appendChild(removeBtn);
+
+        container.appendChild(card);
+
+        summary.cal += meal.calories;
+        summary.pro += meal.protein;
+        summary.carb += meal.carbs;
+        summary.fat += meal.fat;
+        summary.cost += meal.cost;
+      });
+
+      const fields = ['Calories', 'Protein', 'Carbs', 'Fat', 'Cost'];
+      const values = [summary.cal, summary.pro, summary.carb, summary.fat, summary.cost.toFixed(2)];
+
+      fields.forEach((label, i) => {
+        const wrapper = document.createElement('div');
+        const bar = document.createElement('div');
+        const fill = document.createElement('div');
+
+        bar.className = 'progress-bar';
+        fill.className = 'progress-fill';
+        fill.style.width = Math.min(values[i] / 10, 100) + '%';
+
+        bar.appendChild(fill);
+        wrapper.innerHTML = `<p>${label}: ${values[i]}</p>`;
+        wrapper.appendChild(bar);
+        progress.appendChild(wrapper);
+      });
+    }
+
+    function saveMealPlan() {
+      const plans = JSON.parse(localStorage.getItem('mealPlans')) || [];
+      plans.push([...basket]);
+      localStorage.setItem('mealPlans', JSON.stringify(plans));
+      alert('Meal Plan Saved!');
+    }
+  </script></body>
+</html>
